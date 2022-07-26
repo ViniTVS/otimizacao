@@ -21,9 +21,9 @@ CA3 >= 0;
     |Ai| = ai + zi
 */
 
-A1 = Y1 + VP1;
-A2 = Y2 + VP2;
-A3 = Y3 + VP3;
+A1 = VP1 + Y1;
+A2 = VP2 + Y2;
+A3 = VP3 + Y3;
 
 A1 >= 0;
 A2 >= 0;
