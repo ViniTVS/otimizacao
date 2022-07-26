@@ -1,0 +1,31 @@
+
+Value of objective function: 175.50000000
+
+Actual values of the variables:
+CA1                      0.954545
+CA2                      0.545455
+CA3                             0
+CT1                            28
+CT2                             0
+CT3                           146
+A1                        190.909
+A2                        109.091
+A3                              0
+VP1                       690.909
+Y1                            500
+VP2                       909.091
+Y2                            800
+VP3                           200
+Y3                            200
+PT1                           140
+PT2                             0
+PT3                           730
+V1                        309.091
+V2                            200
+V3                            200
+PH1                           760
+PH2                          1000
+PH3                           220
+Tmax                         1000
+Vmin                          200
+Vmax                         1000

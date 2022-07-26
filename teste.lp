@@ -21,9 +21,32 @@ CA3 >= 0;
     |Ai| = ai + zi
 */
 
-A1 = VP1 + Y1;
-A2 = VP2 + Y2;
-A3 = VP3 + Y3;
+
+dif2 - dif1 = V1 - V0;
+dif3 - dif2 = V1 - V0;
+dif4 - dif3 = V1 - V0;
+
+dif11 - dif12 = V0 - V1;
+dif11 + dif12 = V1 - V0;
+
+dif21 - dif22 = V1 - V1;
+dif21 + dif22 = V1 - V2;
+
+dif31 - dif32 = V3 - V2;
+dif31 + dif32 = V2 - V3;
+
+dif11 >= 0;
+dif21 >= 0;
+dif31 >= 0;
+
+dif12 >= 0;
+dif22 >= 0;
+dif32 >= 0;
+
+
+A1 = dif11 + dif12;
+A2 = dif21 + dif22;
+A3 = dif31 + dif32;
 
 A1 >= 0;
 A2 >= 0;
@@ -56,8 +79,9 @@ PT3 >= 0;
 Y1 = 500;
 Y2 = 800;
 Y3 = 200;
+V0 = 500;
 
-V1 = 500 + Y1 - VP1;
+V1 = V0 + Y1 - VP1;
 V2 = V1 + Y2 - VP2;
 V3 = V2 + Y3 - VP3;
 
@@ -65,7 +89,7 @@ VP1 >= 0;
 VP2 >= 0;
 VP3 >= 0;
 /*  --------------------------------------------
-    Restrições de demanda:
+    Restrições de demanzda:
     PHi + PTi >= Di
     PHi = Prod. da Hidro. no mes
     PTi = Prod. da Termo. no mes
