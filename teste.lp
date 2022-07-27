@@ -10,47 +10,36 @@ CA1 = 0.005A1;
 CA2 = 0.005A2;
 CA3 = 0.005A3;
 
-CA1 >= 0;
-CA2 >= 0;
-CA3 >= 0;
 /* 
-    Ai = Vi - Vi-1
-
-    e: 
-     Ai  = ai - zi
-    |Ai| = ai + zi
+    Ai = |Vi - Vi-1|
+    
+    Dividindo Ai entre seu valor absoluto e em módulo:
+    Vi - Vi-1 = xi + zi (absoluto)
+    Vi-1 + Vi = xi - zi (módulo)
+    
+    Ai = xi + zi
 */
 
+x1 - z1 = V0 - V1;
+x1 + z1 = V1 - V0;
 
-dif2 - dif1 = V1 - V0;
-dif3 - dif2 = V1 - V0;
-dif4 - dif3 = V1 - V0;
+x2 - z2 = V1 - V1;
+x2 + z2 = V1 - V2;
 
-dif11 - dif12 = V0 - V1;
-dif11 + dif12 = V1 - V0;
+x3 - z3 = V3 - V2;
+x3 + z3 = V2 - V3;
 
-dif21 - dif22 = V1 - V1;
-dif21 + dif22 = V1 - V2;
+x1 >= 0;
+x2 >= 0;
+x3 >= 0;
 
-dif31 - dif32 = V3 - V2;
-dif31 + dif32 = V2 - V3;
+z1 >= 0;
+z2 >= 0;
+z3 >= 0;
 
-dif11 >= 0;
-dif21 >= 0;
-dif31 >= 0;
-
-dif12 >= 0;
-dif22 >= 0;
-dif32 >= 0;
-
-
-A1 = dif11 + dif12;
-A2 = dif21 + dif22;
-A3 = dif31 + dif32;
-
-A1 >= 0;
-A2 >= 0;
-A3 >= 0;
+A1 = x1 + z1;
+A2 = x2 + z2;
+A3 = x3 + z3;
 
 
 /*  --------------------------
@@ -67,6 +56,14 @@ CT3 = 0.2PT3;
 PT1 >= 0;
 PT2 >= 0;
 PT3 >= 0;
+
+/* PTi <= Tmax */
+Tmax = 1000;
+
+PT1 <= Tmax;
+PT2 <= Tmax;
+PT3 <= Tmax;
+
 
 /*  --------------------------------------------
     Volume do reservatorio de cada mes:
@@ -89,7 +86,7 @@ VP1 >= 0;
 VP2 >= 0;
 VP3 >= 0;
 /*  --------------------------------------------
-    Restrições de demanzda:
+    Restrições de demanda:
     PHi + PTi >= Di
     PHi = Prod. da Hidro. no mes
     PTi = Prod. da Termo. no mes
@@ -109,16 +106,6 @@ PH1 = 1.1VP1;
 PH2 = 1.1VP2;
 PH3 = 1.1VP3;
 
-/* PTi <= Tmax */
-Tmax = 1000;
-
-PT1 <= Tmax;
-PT2 <= Tmax;
-PT3 <= Tmax;
-
-PT1 >= 0;
-PT2 >= 0;
-PT3 >= 0;
 
 /*  --------------------------------------------
     Restrições de volume:
