@@ -32,13 +32,14 @@ def main():
     # custo ambiental de cada 
     CA = entrada[5]
 
-
+    # 
     saida = "min: "
     valores_min = []
     for i in range(1, n_vars + 1):
         valores_min.append("CA" + str(i) + " + CT" + str(i))
 
-    saida += " + ".join(valores_min) + "\n\n"
+    saida += " + ".join(valores_min) + ";\n"
+    print(saida)
 
     #   ------------------------------
     #   Custos Ambientais de cada mes:
@@ -48,7 +49,7 @@ def main():
     #   CA = 0.005;
     #   ------------------------------ 
     for i in range(1, n_vars + 1):
-        saida += "CA" + str(i) +  " = " + CA +"A" + str(i) + ";\n"
+        print("CA" + str(i) +  " = " + CA +"A" + str(i) + ";")
     #   -------------------------------------------------
     #   Ai = |Vi - Vi-1|
     # 
@@ -58,17 +59,17 @@ def main():
     #   Então:
     #   Ai = xi + zi
     #   ---------------------------------------------------
-    saida += "\n"
+    print()
     for i in range(1, n_vars + 1):
-        saida += "x" + str(i) + " - z" + str(i) + " = V" + str(i-1) + " - V" + str(i) + ";\n"
-        saida += "x" + str(i) + " + z" + str(i) + " = V" + str(i) + " - V" + str(i-1) + ";\n\n"
-
+        print("x" + str(i) + " + z" + str(i) + " = V" + str(i-1) + " - V" + str(i) + ";")
+        print("x" + str(i) + " - z" + str(i) + " = V" + str(i) + " - V" + str(i-1) + ";\n")
+    # xi e zi >= 0
     for i in range(1, n_vars + 1):
-        saida += "x" + str(i) + " >= 0;\n"
-        saida += "z" + str(i) + " >= 0;\n\n"
-
+        print("x" + str(i) + " >= 0;")
+        print("z" + str(i) + " >= 0;\n")
+    # Ai = xi + zi
     for i in range(1, n_vars + 1):
-        saida += "A" + str(i) + " = x" + str(i) + " + z" + str(i) + ";\n"
+        print("A" + str(i) + " = x" + str(i) + " + z" + str(i) + ";")
 
     #   --------------------------
     #   Custo Termo por mes:
@@ -77,21 +78,57 @@ def main():
     #   CT : Custo Termo.
     #   CT : 0.2;
     #   -------------------------- 
-
-    saida += "\n"
+    print()
     for i in range(1, n_vars + 1):
-        saida += "CT" + str(i) + " = " + str(custo_ger) + "PT" + str(i) + ";\n"
-
-    saida += "\n"
+        print("CT" + str(i) + " = " + str(custo_ger) + "PT" + str(i) + ";")
+    print()
     for i in range(1, n_vars + 1):
-        saida += "PT" + str(i) + " >= 0;\nPT" + str(i) + " <= " + str(Tmax) + ";\n"
+        print("PT" + str(i) + " >= 0;\nPT" + str(i) + " <= " + str(Tmax) + ";\n")
 
+    #   --------------------------------------------
+    #   Volume do reservatorio de cada mes:
+    #   Vi = Vi-1 + Yi - VPi
+    #   Vi: Volume no mes
+    #   Yi: Volume de chuva mes
+    #   VPi: Volume para Producao de energia no mes
+    #   --------------------------------------------
+    for i, Y in enumerate(afluencias):
+        print("Y" + str(i+1) + " = " + Y + ";")
 
-    print(saida)
+    print("\nV0 = " + Vini + ";")
+    for i in range(1, n_vars + 1):
+        print("V" + str(i) + " = " + "V" + str(i-1) + " + Y" + str(i) + " - VP" + str(i) + ";")
+    print()
+    for i in range(1, n_vars + 1):
+        print("VP" + str(i) + " >= 0;")
 
+    #   -----------------------------
+    #   Restrições de demanda:
+    #   PHi + PTi >= Di
+    #   PHi: Prod. da Hidro. no mes
+    #   PTi: Prod. da Termo. no mes
+    #   Di: Demanda do mes
+    #   ----------------------------
+    for i in range(1, n_vars + 1):
+        print("PH" + str(i) + " + PT" + str(i) + " >= " + demandas[i - 1] + ";")
+    #   --------------------------
+    #   coef. de geração da Hidro:
+    #   k = 1.1;
+    #   PHi = k*VPi 
+    #   --------------------------
+    print()
+    for i in range(1, n_vars + 1):
+        print("PH" + str(i) + " = " + k + "VP" + str(i) + ";")
+  
+    #   --------------------------------------------
+    #   Restrições de volume:
+    #   Vmin <= Vi <= Vmax
+    #   -------------------------------------------- 
+    print("\nVmin = " + Vmin +";\nVmax = " + Vmax + ";\n")
+    for i in range(1, n_vars + 1):
+        print("Vmin <= V" + str(i) + ";\nV" + str(i) + " <= Vmax;\n")
 
-
-
+    # print(saida)
     sys.exit(0) # termina execução sem erros
 
 

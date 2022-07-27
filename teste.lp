@@ -14,8 +14,8 @@ CA3 = 0.005A3;
     Ai = |Vi - Vi-1|
     
     Dividindo Ai entre seu valor absoluto e em módulo:
-    Vi-1 - Vi = xi + zi (absoluto)
-    Vi - Vi-1 = xi - zi (módulo)
+    Vi-1 - Vi = xi + zi (módulo)
+    Vi - Vi-1 = xi - zi (absoluto)
     
     Ai = xi + zi
 */
