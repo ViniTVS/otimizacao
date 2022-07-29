@@ -1,12 +1,12 @@
+#!/usr/bin/python
 import sys
-
 
 def main():
     # obtém entrada em formato de lista (um item para cada linha)
     entrada = sys.stdin.readlines()
 
     if (len(entrada) < 6):
-        sys.exit(1) # erro de entrada
+        sys.exit(1) # erro de entrada - menos linhas que o esperado
     # retira os \n de cada linha de entrada
     for i, linha in enumerate(entrada):
         entrada[i] = linha.replace("\n", "")
@@ -15,8 +15,9 @@ def main():
     demandas = entrada[1].split(" ") # separa as demandas
     afluencias = entrada[2].split(" ") # separa as afluências
 
+    
     if (len(demandas) != n_vars) or (len(afluencias) != n_vars):
-        sys.exit(1) # erro de entrada
+        sys.exit(1) # erro de entrada - número de demandas ou aflulências errados 
 
     linha = entrada[3].split(" ")
     # Volumes iniciais, min. e max e coef. de geração da Hidrelétrica
@@ -29,7 +30,7 @@ def main():
     # Geração max. e custo de geração da Termoelétrica 
     Tmax = linha[0]
     custo_ger = linha[1]
-    # custo ambiental de cada 
+    # custo ambiental de cada m³ de variação no volume
     CA = entrada[5]
 
     # 
