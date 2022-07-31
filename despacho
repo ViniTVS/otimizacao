@@ -5,7 +5,7 @@ def main():
     # obtém entrada em formato de lista (um item para cada linha)
     entrada = sys.stdin.readlines()
 
-    if (len(entrada) < 6):
+    if (len(entrada) != 6):
         sys.exit(1) # erro de entrada - menos linhas que o esperado
     # retira os \n de cada linha de entrada
     for i, linha in enumerate(entrada):
