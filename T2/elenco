@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+import sys
+
+class Ator:
+    def __init__(self, valor, grupos):
+        self.valor = valor
+        self.grupos = grupos
+
+    def print(self):
+        print("Valor:", self.valor, "Grupos:", self.grupos)
+
+def main():
+    # obtém entrada em formato de lista (um item para cada linha)
+    entrada = sys.stdin.readlines()
+    # retira os \n de cada linha de entrada
+    for i, linha in enumerate(entrada):
+        entrada[i] = linha.replace("\n", "")
+
+    linha = entrada[0].split(" ")
+    l = int(linha[0]) # num de grupos
+    m = int(linha[1]) # num de atores
+    n = int(linha[2]) # num de personagens
+
+    n_linha = 1
+    atores = []
+    for i in range(m):
+        linha = entrada[n_linha].split(" ")
+        valor = int(linha[0])
+        
+        s = int(linha[1])
+        grupos = []
+        n_linha += 1
+
+        for j in range(s):
+            grupos.append(int(entrada[n_linha]))
+            n_linha += 1
+
+        atores.append(Ator(valor, grupos))
+
+
+    for ator in atores:
+        ator.print()
+
+
+
+
+if __name__ == "__main__":
+    main()
