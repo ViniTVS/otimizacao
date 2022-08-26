@@ -38,8 +38,47 @@ def main():
         atores.append(Ator(valor, grupos))
 
 
+    atores_escolhidos = []
+    atores_faltando = []
+    # escolho o ator 2
+    # atores_escolhidos.append(atores[1])
+    # atores.pop(1)
+    # atores_escolhidos.append(atores[1])
+    # atores.pop(1)
+    atores_escolhidos.append(atores[0])
+    atores.pop(0)
+    # e passo os demais p/ os que faltam
     for ator in atores:
-        ator.print()
+        atores_faltando.append(ator)
+
+    
+    print(limitanteDada(atores_escolhidos, atores_faltando, len(atores)))
+
+
+
+
+# função limitante que o prof deu
+def limitanteDada(atores_escolhidos, atores_faltando, n_atores):
+    valor_soma = 0
+    for ator in atores_escolhidos:
+        valor_soma += ator.valor
+
+    valor_soma += (n_atores - len(atores_escolhidos))* minimo(atores_faltando) 
+    return valor_soma
+
+    
+# calculando o valor mínimo de um ator numa lista de atores
+def minimo(atores):
+    n_atores = len(atores)
+    if (n_atores == 0):
+        return 0    
+    # assume como mais barato o primeiro do array
+    min = atores[0].valor
+    for i in range(1, n_atores):
+        if (atores[i].valor < min):
+            min = atores[i].valor
+
+    return min
 
 
 
