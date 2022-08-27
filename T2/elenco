@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 import sys
 
+OPT = sys.maxsize
+Xopt = []
+grupos = 0
+l = 0 # num de grupos
+m = 0 # num de atores
+n = 0 # num de personagens
+
 class Ator:
     def __init__(self, valor, grupos):
         self.valor = valor
@@ -17,6 +24,9 @@ def main():
         entrada[i] = linha.replace("\n", "")
 
     linha = entrada[0].split(" ")
+    global l
+    global m
+    global n
     l = int(linha[0]) # num de grupos
     m = int(linha[1]) # num de atores
     n = int(linha[2]) # num de personagens
@@ -41,8 +51,8 @@ def main():
     atores_escolhidos = []
     atores_faltando = []
     # escolho o ator 2
-    # atores_escolhidos.append(atores[1])
-    # atores.pop(1)
+    atores_escolhidos.append(atores[1])
+    atores.pop(1)
     # atores_escolhidos.append(atores[1])
     # atores.pop(1)
     atores_escolhidos.append(atores[0])
@@ -51,20 +61,23 @@ def main():
     for ator in atores:
         atores_faltando.append(ator)
 
-    
-    print(limitanteDada(atores_escolhidos, atores_faltando, len(atores)))
-
+    print("Atores escolhidos:")
+    for ator in atores_escolhidos:
+        ator.print()
+    # print(limitanteDada(atores_escolhidos, atores_faltando, len(atores)))
+    print(viavel(atores_escolhidos))
 
 
 
 # função limitante que o prof deu
 def limitanteDada(atores_escolhidos, atores_faltando, n_atores):
-    valor_soma = 0
+    total = 0
+    # faz o somatório
     for ator in atores_escolhidos:
-        valor_soma += ator.valor
+        total += ator.valor
 
-    valor_soma += (n_atores - len(atores_escolhidos))* minimo(atores_faltando) 
-    return valor_soma
+    total += (n_atores - len(atores_escolhidos))* minimo(atores_faltando) 
+    return total
 
     
 # calculando o valor mínimo de um ator numa lista de atores
@@ -80,8 +93,30 @@ def minimo(atores):
 
     return min
 
+def viavel(atores_escolhidos):
+    global l
+    global n
+    # verifica se o num de atores escolhidos está correto
+    if (len(atores_escolhidos) != n):
+        return False
+    # verifica se todos os grupos estão representados
+    grupos = []
+    for ator in atores_escolhidos:
+        for grupo in ator.grupos:
+            if not(grupo in grupos):
+                grupos.append(grupo)
 
+    if (len(grupos) == l):
+        return True
+    return False
 
+# def resolver(indice, insere, atores, atores_escolhidos, atores_restantes):
+#     if viavel(atores_escolhidos):
+#         if 
+#     else:
+    
+    
+#     return 0
 
 if __name__ == "__main__":
     main()
