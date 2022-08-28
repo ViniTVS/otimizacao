@@ -3,7 +3,7 @@ import sys
 
 OPT = sys.maxsize
 Xopt = []
-grupos = 0
+atores = []
 l = 0 # num de grupos
 m = 0 # num de atores
 n = 0 # num de personagens
@@ -30,9 +30,12 @@ def main():
     l = int(linha[0]) # num de grupos
     m = int(linha[1]) # num de atores
     n = int(linha[2]) # num de personagens
-
+    global atores
     n_linha = 1
     atores = []
+    atores_escolhidos = []
+    atores_faltando = []
+
     for i in range(m):
         linha = entrada[n_linha].split(" ")
         valor = int(linha[0])
@@ -46,37 +49,27 @@ def main():
             n_linha += 1
 
         atores.append(Ator(valor, grupos))
+        atores_faltando.append(Ator(valor, grupos))
 
 
-    atores_escolhidos = []
-    atores_faltando = []
-    # escolho o ator 2
-    atores_escolhidos.append(atores[1])
-    atores.pop(1)
-    # atores_escolhidos.append(atores[1])
-    # atores.pop(1)
-    atores_escolhidos.append(atores[0])
-    atores.pop(0)
-    # e passo os demais p/ os que faltam
-    for ator in atores:
-        atores_faltando.append(ator)
-
-    print("Atores escolhidos:")
-    for ator in atores_escolhidos:
-        ator.print()
-    # print(limitanteDada(atores_escolhidos, atores_faltando, len(atores)))
-    print(viavel(atores_escolhidos))
-
-
+    # print(limitanteDada(atores_escolhidos, atores_faltando)
+    # print(verificaViavel(atores_escolhidos))
+    resolver(0, atores_escolhidos, atores_faltando)
+    global OPT
+    global Xopt
+    print("\n\n\nResultado:")
+    print(OPT)
+    printLista(Xopt)
 
 # função limitante que o prof deu
-def limitanteDada(atores_escolhidos, atores_faltando, n_atores):
+def limitanteDada(atores_escolhidos, atores_faltando):
+    global n
     total = 0
     # faz o somatório
     for ator in atores_escolhidos:
         total += ator.valor
 
-    total += (n_atores - len(atores_escolhidos))* minimo(atores_faltando) 
+    total += (n - len(atores_escolhidos))* minimo(atores_faltando) 
     return total
 
     
@@ -93,30 +86,77 @@ def minimo(atores):
 
     return min
 
-def viavel(atores_escolhidos):
+def verificaViavel(atores_escolhidos):
     global l
     global n
     # verifica se o num de atores escolhidos está correto
     if (len(atores_escolhidos) != n):
-        return False
+        return (False, 0)
     # verifica se todos os grupos estão representados
     grupos = []
+    valor = 0
     for ator in atores_escolhidos:
+        valor += ator.valor
         for grupo in ator.grupos:
             if not(grupo in grupos):
                 grupos.append(grupo)
 
-    if (len(grupos) == l):
-        return True
-    return False
+    if (len(grupos) != l):
+        return (False, 0)
+    
+    return (True, valor)
 
-# def resolver(indice, insere, atores, atores_escolhidos, atores_restantes):
-#     if viavel(atores_escolhidos):
-#         if 
-#     else:
+def resolver(indice, Escolhidos, Faltam):
+    global OPT
+    global Xopt
+    global n
+    global atores
+
+    print("\n\nindice:", indice)
+    print("Escolhidos:")
+    printLista(Escolhidos)
+    print("Faltam:")
+    printLista(Faltam)
+
+    # já escolhemos o número de atores
+    (viavel, novo_val) = verificaViavel(Escolhidos)
+    if viavel:
+        if novo_val < OPT:
+            OPT = novo_val
+            Xopt = Escolhidos
+    # ainda falta escolher atores
+    if (len(Escolhidos) < n):
+        # não posso escolher um ator fora do índice
+        if(indice >= len(atores)):
+            return
+        E = Escolhidos.copy()
+        F = Faltam.copy()
+        # não escolho ator
+        print("\nNão escolho:", indice)
+        resolver(indice + 1, E, F)
+        # E = Escolhidos.copy()
+        # F = Faltam.copy()
+        
+        # decido escolher ator
+        print("\nEscolho:", indice)
+        escolheAtor(E, F, atores[indice])
+        resolver(indice + 1, E, F)
+
+
+def escolheAtor(E, F, ator):
+    for a in F:
+        if (a.valor == ator.valor and set(a.grupos) == set(ator.grupos)):
+            F.remove(a)
+            break
+
+    E.append(ator)
     
     
 #     return 0
+def printLista(lista):
+    for item in lista:
+        item.print()
+
 
 if __name__ == "__main__":
     main()
