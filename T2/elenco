@@ -9,9 +9,9 @@ l = 0       # num de grupos
 m = 0       # num de atores
 n = 0       # num de personagens
 # argumentos:
-a = True    # 
-f = True
-o = True
+lim_dada    = False # usar função limitante dos profs.
+corte_via   = True  # cortes de viabilidade
+corte_oti   = True  # cortes de otimalidade
 
 class Ator:
     def __init__(self, valor, grupos, id):
@@ -106,7 +106,25 @@ def limitanteDada(atores_escolhidos, atores_faltando):
     total += (n - len(atores_escolhidos))* minimo(atores_faltando) 
     return total
 
-    
+
+def limitanteFeita(atores_escolhidos, atores_faltando):
+    global l    # num de grupos
+    global m    # num de atores
+    global n    # num de personagens
+    # o array de atores faltando está ordenado por menor valor por número de
+    # grupos que o ator satisfaz 
+    grupos = []
+    total = 0
+    for ator in atores_escolhidos:
+        total += ator.valor
+        
+    total += atores_faltando[0].valor
+    return total
+
+
+
+
+
 # calculando o valor mínimo de um ator numa lista de atores
 def minimo(atores):
     n_atores = len(atores)
@@ -119,6 +137,7 @@ def minimo(atores):
             min = atores[i].valor
 
     return min
+    
 def verificaViabilidade(atores_escolhidos):
     global l
     global n
@@ -145,33 +164,43 @@ def resolver(indice, Escolhidos, Faltam):
     global n        # num. personagens
     global m        # num. atores
     global atores   # array contendo todos os atores
-    global a
-    global f 
-    global o 
+    global lim_dada # usar função limitante dos profs.
+    global corte_via# cortes de viabilidade
+    global corte_oti# cortes de otimalidade
 
-    # verifica se é viável
+    # verifica se o grupo de atores escolhidos é viável
     (viavel, novo_val) = verificaViabilidade(Escolhidos)
     if viavel:
         if novo_val < OPT:
             OPT = novo_val
             Xopt = Escolhidos
 
-    # não posso escolher um ator fora do índice
+    # não tem mais atores para escolher
     if(indice >= m):
         return
+    # faz o corte de viabilidade (as escolhas de atores restantes formam uma resposta possível?)
+    if corte_via:
+        if cortaViabilidade(indice, Escolhidos, Faltam):
+            return
+    # faz o corte de otimalidade (existe a possibilidade uma escolha de atores mais barata?)
+    if corte_oti:
+        B = OPT
+        if lim_dada:
+            B = limitanteDada(Escolhidos, Faltam)
+        else:
+            B = limitanteDada(Escolhidos, Faltam)
+
+        if (B >= OPT):
+            return
     
-    B = limitanteDada(Escolhidos, Faltam)
-    if (B >= OPT):
-        return
-    # ainda falta escolher atores
-    if (len(Escolhidos) < n):
-        E = Escolhidos.copy()
-        F = Faltam.copy()
-        # decido não escolher ator
-        resolver(indice + 1, E, F)
-        # decido escolher ator
-        escolheAtor(E, F, atores[indice])
-        resolver(indice + 1, E, F)
+    # ainda falta escolher atores        
+    E = Escolhidos.copy()
+    F = Faltam.copy()
+    # decido não escolher ator
+    resolver(indice + 1, E, F)
+    # decido escolher ator
+    escolheAtor(E, F, atores[indice])
+    resolver(indice + 1, E, F)
 
 
 def escolheAtor(E, F, ator):
@@ -181,7 +210,34 @@ def escolheAtor(E, F, ator):
             break
 
     E.append(ator)
-       
+    
+def cortaViabilidade(indice, Escolhidos, Faltam):
+    global l        # num de grupos
+    global n        # num. personagens
+    global m        # num. atores
+    global atores   # array contendo todos os atores
+    # o número de atores escolhidos + número de atores que faltam deve ser ao menos 
+    # que o número de atores que devem ser escolhidos - indice de atore
+    if (len(Faltam) + len(Escolhidos) + indice < n ):
+        return True
+    
+    grupos = []
+    for ator in Escolhidos:
+        for grupo in ator.grupos:
+            if not(grupo in grupos):
+                grupos.append(grupo)
+    
+    for i in range(indice, n):
+        for grupo in atores[i].grupos:
+            if not(grupo in grupos):
+                grupos.append(grupo)
+    
+    if (len(grupos) < l):
+        return True
+
+    return False
+
+
 #     return 0
 def printLista(lista):
     for item in lista:
@@ -192,9 +248,9 @@ if __name__ == "__main__":
     
     for arg in sys.argv:
         if arg == "-a":
-            a = False
+            lim_dada  = True
         if arg == "-f":
-            f = False
+            corte_via = False
         if arg == "-o":
-            o = False
+            corte_oti = False
     main()
