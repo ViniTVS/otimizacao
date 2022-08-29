@@ -1,20 +1,45 @@
 #!/usr/bin/python3
 import sys
+from functools import cmp_to_key
 
 OPT = sys.maxsize
 Xopt = []
 atores = []
-l = 0 # num de grupos
-m = 0 # num de atores
-n = 0 # num de personagens
+l = 0       # num de grupos
+m = 0       # num de atores
+n = 0       # num de personagens
+# argumentos:
+a = True    # 
+f = True
+o = True
 
 class Ator:
-    def __init__(self, valor, grupos):
+    def __init__(self, valor, grupos, id):
         self.valor = valor
         self.grupos = grupos
+        self.id = id
+        self.v_grupo = (valor / len(grupos))
 
     def print(self):
-        print("Valor:", self.valor, "Grupos:", self.grupos)
+        print("Valor:", self.valor, "Grupos:", self.grupos, "Id:", self.id, "Valor/grupo:", self.v_grupo)
+
+
+def ordId(a, b):
+    if (a.id > b.id):
+        return 1
+    return -1
+
+def ordVGrupo(a, b):
+    if (a.v_grupo > b.v_grupo):
+        return 1
+    elif (a.v_grupo == b.v_grupo and len(a.grupos) < len(b.grupos)):
+        return 1
+    return -1
+
+ordenaId = cmp_to_key(ordId)
+ordenaValGrupo = cmp_to_key(ordVGrupo)
+
+
 
 def main():
     # obtém entrada em formato de lista (um item para cada linha)
@@ -35,7 +60,7 @@ def main():
     atores = []
     atores_escolhidos = []
     atores_faltando = []
-
+    # lê informação de cada ator
     for i in range(m):
         linha = entrada[n_linha].split(" ")
         valor = int(linha[0])
@@ -48,18 +73,27 @@ def main():
             grupos.append(int(entrada[n_linha]))
             n_linha += 1
 
-        atores.append(Ator(valor, grupos))
-        atores_faltando.append(Ator(valor, grupos))
+        atores.append(Ator(valor, grupos, i + 1))
+        atores_faltando.append(Ator(valor, grupos, i + 1))
 
 
-    # print(limitanteDada(atores_escolhidos, atores_faltando)
-    # print(verificaViavel(atores_escolhidos))
     resolver(0, atores_escolhidos, atores_faltando)
     global OPT
     global Xopt
-    print("\n\n\nResultado:")
-    print(OPT)
-    printLista(Xopt)
+    if OPT != sys.maxsize:
+        Xopt.sort(key=ordenaId)
+        # print 1 ele.
+        print(Xopt[0].id, end="")
+        # print resto
+        for i in range(1, len(Xopt)):
+            print(" " + str(Xopt[i].id), end="")
+        print()
+        print(OPT)
+    else:
+        print("Inviável")
+
+    print("fatal error", file=sys.stderr)
+
 
 # função limitante que o prof deu
 def limitanteDada(atores_escolhidos, atores_faltando):
@@ -85,8 +119,7 @@ def minimo(atores):
             min = atores[i].valor
 
     return min
-
-def verificaViavel(atores_escolhidos):
+def verificaViabilidade(atores_escolhidos):
     global l
     global n
     # verifica se o num de atores escolhidos está correto
@@ -101,57 +134,54 @@ def verificaViavel(atores_escolhidos):
             if not(grupo in grupos):
                 grupos.append(grupo)
 
-    if (len(grupos) != l):
+    if (len(grupos) < l):
         return (False, 0)
-    
+        
     return (True, valor)
 
 def resolver(indice, Escolhidos, Faltam):
-    global OPT
-    global Xopt
-    global n
-    global atores
+    global OPT      # sol. ótima
+    global Xopt     # val. sol. ótima
+    global n        # num. personagens
+    global m        # num. atores
+    global atores   # array contendo todos os atores
+    global a
+    global f 
+    global o 
 
-    print("\n\nindice:", indice)
-    print("Escolhidos:")
-    printLista(Escolhidos)
-    print("Faltam:")
-    printLista(Faltam)
-
-    # já escolhemos o número de atores
-    (viavel, novo_val) = verificaViavel(Escolhidos)
+    # verifica se é viável
+    (viavel, novo_val) = verificaViabilidade(Escolhidos)
     if viavel:
         if novo_val < OPT:
             OPT = novo_val
             Xopt = Escolhidos
+
+    # não posso escolher um ator fora do índice
+    if(indice >= m):
+        return
+    
+    B = limitanteDada(Escolhidos, Faltam)
+    if (B >= OPT):
+        return
     # ainda falta escolher atores
     if (len(Escolhidos) < n):
-        # não posso escolher um ator fora do índice
-        if(indice >= len(atores)):
-            return
         E = Escolhidos.copy()
         F = Faltam.copy()
-        # não escolho ator
-        print("\nNão escolho:", indice)
+        # decido não escolher ator
         resolver(indice + 1, E, F)
-        # E = Escolhidos.copy()
-        # F = Faltam.copy()
-        
         # decido escolher ator
-        print("\nEscolho:", indice)
         escolheAtor(E, F, atores[indice])
         resolver(indice + 1, E, F)
 
 
 def escolheAtor(E, F, ator):
     for a in F:
-        if (a.valor == ator.valor and set(a.grupos) == set(ator.grupos)):
+        if (a.id == ator.id):
             F.remove(a)
             break
 
     E.append(ator)
-    
-    
+       
 #     return 0
 def printLista(lista):
     for item in lista:
@@ -159,4 +189,12 @@ def printLista(lista):
 
 
 if __name__ == "__main__":
+    
+    for arg in sys.argv:
+        if arg == "-a":
+            a = False
+        if arg == "-f":
+            f = False
+        if arg == "-o":
+            o = False
     main()
