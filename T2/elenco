@@ -8,6 +8,7 @@ atores = []
 l = 0       # num de grupos
 m = 0       # num de atores
 n = 0       # num de personagens
+count = 0
 # argumentos:
 lim_dada    = False # usar função limitante dos profs.
 corte_via   = True  # cortes de viabilidade
@@ -80,6 +81,7 @@ def main():
     resolver(0, atores_escolhidos, atores_faltando)
     global OPT
     global Xopt
+    global count
     if OPT != sys.maxsize:
         Xopt.sort(key=ordenaId)
         # print 1 ele.
@@ -92,7 +94,7 @@ def main():
     else:
         print("Inviável")
 
-    print("fatal error", file=sys.stderr)
+    print(count, file=sys.stderr)
 
 
 # função limitante que o prof deu
@@ -135,7 +137,6 @@ def minimo(atores):
     for i in range(1, n_atores):
         if (atores[i].valor < min):
             min = atores[i].valor
-
     return min
     
 def verificaViabilidade(atores_escolhidos):
@@ -167,20 +168,21 @@ def resolver(indice, Escolhidos, Faltam):
     global lim_dada # usar função limitante dos profs.
     global corte_via# cortes de viabilidade
     global corte_oti# cortes de otimalidade
-
+    global count
+    count += 1
+    
     # verifica se o grupo de atores escolhidos é viável
     (viavel, novo_val) = verificaViabilidade(Escolhidos)
     if viavel:
         if novo_val < OPT:
             OPT = novo_val
             Xopt = Escolhidos
-
     # não tem mais atores para escolher
     if(indice >= m):
         return
     # faz o corte de viabilidade (as escolhas de atores restantes formam uma resposta possível?)
     if corte_via:
-        if cortaViabilidade(indice, Escolhidos, Faltam):
+        if cortaViabilidade(indice, Escolhidos):
             return
     # faz o corte de otimalidade (existe a possibilidade uma escolha de atores mais barata?)
     if corte_oti:
@@ -211,23 +213,25 @@ def escolheAtor(E, F, ator):
 
     E.append(ator)
     
-def cortaViabilidade(indice, Escolhidos, Faltam):
+def cortaViabilidade(indice, Escolhidos):
     global l        # num de grupos
     global n        # num. personagens
     global m        # num. atores
     global atores   # array contendo todos os atores
-    # o número de atores escolhidos + número de atores que faltam deve ser ao menos 
-    # que o número de atores que devem ser escolhidos - indice de atore
-    if (len(Faltam) + len(Escolhidos) + indice < n ):
-        return True
-    
+    # o número máximo de personagens que podemos ter com a atual seleção é:
+    # |A| - índice (mas como vetores começam de 0, soma 1) + |E| 
+    if (m - (indice + 1) + len(Escolhidos) < n ):
+        return True # se for menos que precisamos, corta
+
+    # verifica se o número de grupos (distintos) dos personagens escolhidos + o número de
+    # grupos dos atores restantes (que não foram escolhidos) satisfaz o valor mínimo
     grupos = []
     for ator in Escolhidos:
         for grupo in ator.grupos:
             if not(grupo in grupos):
                 grupos.append(grupo)
     
-    for i in range(indice, n):
+    for i in range(indice, m):
         for grupo in atores[i].grupos:
             if not(grupo in grupos):
                 grupos.append(grupo)
