@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import time
 from functools import cmp_to_key
 
 OPT = sys.maxsize
@@ -77,8 +78,10 @@ def main():
         atores.append(Ator(valor, grupos, i + 1))
         atores_faltando.append(Ator(valor, grupos, i + 1))
 
-
+    time_start = time.time()
     resolver(0, atores_escolhidos, atores_faltando)
+    time_end = time.time()
+    
     global OPT
     global Xopt
     global count
@@ -95,6 +98,7 @@ def main():
         print("Inviável")
 
     print(count, file=sys.stderr)
+    print(time_end - time_start, file=sys.stderr)
 
 
 # função limitante que o prof deu
@@ -219,8 +223,8 @@ def cortaViabilidade(indice, Escolhidos):
     global m        # num. atores
     global atores   # array contendo todos os atores
     # o número máximo de personagens que podemos ter com a atual seleção é:
-    # |A| - índice (mas como vetores começam de 0, soma 1) + |E| 
-    if (m - (indice + 1) + len(Escolhidos) < n ):
+    # |A| - índice atual(não se pode masi esolher os atores anteriores) + |E| 
+    if (m - (indice) + len(Escolhidos) < n ):
         return True # se for menos que precisamos, corta
 
     # verifica se o número de grupos (distintos) dos personagens escolhidos + o número de
@@ -241,15 +245,12 @@ def cortaViabilidade(indice, Escolhidos):
 
     return False
 
-
-#     return 0
 def printLista(lista):
     for item in lista:
         item.print()
 
 
-if __name__ == "__main__":
-    
+if __name__ == "__main__": 
     for arg in sys.argv:
         if arg == "-a":
             lim_dada  = True
