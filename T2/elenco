@@ -20,27 +20,9 @@ class Ator:
         self.valor = valor
         self.grupos = grupos
         self.id = id
-        self.v_grupo = (valor / len(grupos))
 
     def print(self):
-        print("Valor:", self.valor, "Grupos:", self.grupos, "Id:", self.id, "Valor/grupo:", self.v_grupo)
-
-
-def ordId(a, b):
-    if (a.id > b.id):
-        return 1
-    return -1
-
-def ordVGrupo(a, b):
-    if (a.v_grupo > b.v_grupo):
-        return 1
-    elif (a.v_grupo == b.v_grupo and len(a.grupos) < len(b.grupos)):
-        return 1
-    return -1
-
-ordenaId = cmp_to_key(ordId)
-ordenaValGrupo = cmp_to_key(ordVGrupo)
-
+        print("Valor:", self.valor, "Grupos:", self.grupos, "Id:", self.id)
 
 
 def main():
@@ -60,8 +42,8 @@ def main():
     global atores
     n_linha = 1
     atores = []
-    atores_escolhidos = []
-    atores_faltando = []
+    Escolhidos = []
+    Faltam = []
     # lê informação de cada ator
     for i in range(m):
         linha = entrada[n_linha].split(" ")
@@ -76,10 +58,14 @@ def main():
             n_linha += 1
 
         atores.append(Ator(valor, grupos, i + 1))
-        atores_faltando.append(Ator(valor, grupos, i + 1))
 
     time_start = time.time()
-    resolver(0, atores_escolhidos, atores_faltando)
+    if not lim_dada:
+        atores.sort(key=lambda x: x.valor)
+        
+    Faltam = atores.copy()
+
+    resolver(0, Escolhidos, Faltam)
     time_end = time.time()
     
     global OPT
@@ -100,36 +86,30 @@ def main():
     print(count, file=sys.stderr)
     print(time_end - time_start, file=sys.stderr)
 
-
 # função limitante que o prof deu
-def limitanteDada(atores_escolhidos, atores_faltando):
+def limitanteDada(Escolhidos, Faltam):
     global n
     total = 0
     # faz o somatório
-    for ator in atores_escolhidos:
+    for ator in Escolhidos:
         total += ator.valor
 
-    total += (n - len(atores_escolhidos))* minimo(atores_faltando) 
+    total += (n - len(Escolhidos))* minimo(Faltam) 
     return total
 
-
-def limitanteFeita(atores_escolhidos, atores_faltando):
-    global l    # num de grupos
-    global m    # num de atores
+def limitanteFeita(indice, Escolhidos, Faltam):
     global n    # num de personagens
     # o array de atores faltando está ordenado por menor valor por número de
     # grupos que o ator satisfaz 
     grupos = []
     total = 0
-    for ator in atores_escolhidos:
+    for ator in Escolhidos:
         total += ator.valor
-        
-    total += atores_faltando[0].valor
+
+    for i in range(n - len(Escolhidos) - len(Faltam)):
+        total += ator.valor
+
     return total
-
-
-
-
 
 # calculando o valor mínimo de um ator numa lista de atores
 def minimo(atores):
@@ -143,20 +123,19 @@ def minimo(atores):
             min = atores[i].valor
     return min
     
-def verificaViabilidade(atores_escolhidos):
+def verificaViabilidade(Escolhidos):
     global l
     global n
     # verifica se o num de atores escolhidos está correto
-    if (len(atores_escolhidos) != n):
+    if (len(Escolhidos) != n):
         return (False, 0)
     # verifica se todos os grupos estão representados
-    grupos = []
+    grupos = dict()
     valor = 0
-    for ator in atores_escolhidos:
+    for ator in Escolhidos:
         valor += ator.valor
-        for grupo in ator.grupos:
-            if not(grupo in grupos):
-                grupos.append(grupo)
+        for n_grupo in ator.grupos:
+            grupos[n_grupo] = 1
 
     if (len(grupos) < l):
         return (False, 0)
@@ -186,7 +165,7 @@ def resolver(indice, Escolhidos, Faltam):
         return
     # faz o corte de viabilidade (as escolhas de atores restantes formam uma resposta possível?)
     if corte_via:
-        if cortaViabilidade(indice, Escolhidos):
+        if cortaViabilidade(Escolhidos, Faltam):
             return
     # faz o corte de otimalidade (existe a possibilidade uma escolha de atores mais barata?)
     if corte_oti:
@@ -194,7 +173,7 @@ def resolver(indice, Escolhidos, Faltam):
         if lim_dada:
             B = limitanteDada(Escolhidos, Faltam)
         else:
-            B = limitanteDada(Escolhidos, Faltam)
+            B = limitanteFeita(indice, Escolhidos, Faltam)
 
         if (B >= OPT):
             return
@@ -202,10 +181,11 @@ def resolver(indice, Escolhidos, Faltam):
     # ainda falta escolher atores        
     E = Escolhidos.copy()
     F = Faltam.copy()
+    ator = F.pop(0)
     # decido não escolher ator
     resolver(indice + 1, E, F)
     # decido escolher ator
-    escolheAtor(E, F, atores[indice])
+    E.append(ator)
     resolver(indice + 1, E, F)
 
 
@@ -217,28 +197,25 @@ def escolheAtor(E, F, ator):
 
     E.append(ator)
     
-def cortaViabilidade(indice, Escolhidos):
+def cortaViabilidade(Escolhidos, Faltam):
     global l        # num de grupos
     global n        # num. personagens
     global m        # num. atores
     global atores   # array contendo todos os atores
-    # o número máximo de personagens que podemos ter com a atual seleção é:
-    # |A| - índice atual(não se pode masi esolher os atores anteriores) + |E| 
-    if (m - (indice) + len(Escolhidos) < n ):
+    
+    if (len(Faltam) + len(Escolhidos) < n ):
         return True # se for menos que precisamos, corta
 
     # verifica se o número de grupos (distintos) dos personagens escolhidos + o número de
     # grupos dos atores restantes (que não foram escolhidos) satisfaz o valor mínimo
-    grupos = []
+    grupos = dict()
     for ator in Escolhidos:
-        for grupo in ator.grupos:
-            if not(grupo in grupos):
-                grupos.append(grupo)
+        for n_grupo in ator.grupos:
+            grupos[n_grupo] = 1
     
-    for i in range(indice, m):
-        for grupo in atores[i].grupos:
-            if not(grupo in grupos):
-                grupos.append(grupo)
+    for ator in Faltam:
+        for n_grupo in ator.grupos:
+            grupos[n_grupo] = 1
     
     if (len(grupos) < l):
         return True
